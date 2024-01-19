@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            font-family: Arial;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Получить по адресу</h1>
+<form action="api/v1/get-by-address.php" method="post" id="getByAddress">
+    <label for="data">Введите адрес: </label>
+    <input type="text" name="data" id="data" required>
+    <button type="submit">Получить</button>
+</form>
+
+<p id = "addressLatitude"></p>
+<p id = "addressLongitude"></p>
+
+<hr>
+
+<h1>Получить по координатам</h1>
+<form action="api/v1/get-by-coordinates.php" method="post" id="getByCoordinates">
+    <label for="data">Широта: </label>
+    <input type="text" name="latitude" id="latitude">
+
+    <label for="data">Долгота: </label>
+    <input type="text" name="longitude" id="longitude">
+
+    <button type="submit">Получить</button>
+</form>
+
+<p id = "countryByCoordinates"></p>
+<p id = "addressByCoordinates"></p>
+<p id = "regionByCoordinates"></p>
+
+</body>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script>
+
+    $('#getByAddress').submit(function (e){
+        e.preventDefault();
+
+        const url = this.getAttribute('action');
+        const method = this.getAttribute('method')
+
+        $.ajax({
+            url: url,
+            type: method,
+            dataType: 'json',
+            data: {
+                data: $('#data').val(),
+            },
+            success: function(data){
+                const latitude = JSON.parse(data.result)[0].lat;
+                const longitude = JSON.parse(data.result)[0].lon;
+
+                console.log(JSON.parse(data.result))
+
+                $("#addressLatitude").text("Широта: " + latitude);
+                $("#addressLongitude").text("Долгота: " + longitude);
+
+            }
+        });
+    });
+
+    $('#getByCoordinates').submit(function (e){
+        e.preventDefault();
+
+        const url = this.getAttribute('action');
+        const method = this.getAttribute('method')
+
+        $.ajax({
+            url: url,
+            type: method,
+            dataType: 'json',
+            data: {
+                latitude : $('#latitude').val(),
+                longitude: $('#longitude').val()
+            },
+            success: function(data){
+                // console.log(JSON.parse(data.result)[0])
+                const result = JSON.parse(data.result).address
+                console.log(result)
+
+                $("#countryByCoordinates").text("Город: " + result.country);
+                $("#addressByCoordinates").text("Адрес: " + result.road + " " + result.house_number);
+                $("#regionByCoordinates").text("Регион: " + result.region);
+
+            }
+        });
+    });
+
+</script>
+
+</html>
